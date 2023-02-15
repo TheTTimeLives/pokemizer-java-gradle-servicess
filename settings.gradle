@@ -1,0 +1,5 @@
+rootProject.name = 'pokemizer'
+include 'java-announcement'
+include 'java-battle'
+include 'java-pokedex'
+include 'java-trainer'
