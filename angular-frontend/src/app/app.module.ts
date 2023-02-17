@@ -16,16 +16,16 @@ import { TestingRequestorButtonComponent } from './testing/testing-requestor-but
     AppComponent,
     LandingPageComponent,
     HeroImageComponent,
-    HttpClientModule,
     BackgroundComponent,
     CallToActionComponent,
     LoginRegisterComponent,
     HamburgerComponent,
-    TestingRequestorButtonComponent
+    TestingRequestorButtonComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
