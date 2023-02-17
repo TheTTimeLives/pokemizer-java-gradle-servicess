@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'angular-frontend';
+
+  ngOnInit() {
+    console.log("This frontend was created in Angular")
+  }
 }

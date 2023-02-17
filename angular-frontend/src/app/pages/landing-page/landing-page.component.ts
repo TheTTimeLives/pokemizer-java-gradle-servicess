@@ -3,8 +3,14 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-landing-page',
   templateUrl: './landing-page.component.html',
-  styleUrls: ['./landing-page.component.less']
+  styleUrls: ['./landing-page.component.less'],
 })
 export class LandingPageComponent {
+
+  wallpaper = {
+    url: "url('../../../assets/images/wallpaper/pokeballs.jpg",
+    left: '',
+    top: ''
+  }
 
 }
