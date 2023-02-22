@@ -3,8 +3,11 @@ package com.melnikprod.javatrainer;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.melnikprod.javatrainer.config.*;
+import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
+// instantiates the beans for the common library
+@ComponentScan(basePackages = {"com.melnikprod.javacommon"})
 public class JavaTrainerApplication {
 
 	public static void main(String[] args) {
