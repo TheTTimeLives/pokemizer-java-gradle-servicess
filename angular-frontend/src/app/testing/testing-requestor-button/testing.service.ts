@@ -12,19 +12,25 @@ export class TestingService {
 
   configUrl = ""
 
-  getTesting() {
-    return this.http.get(this.configUrl);
+  getTesting(port: any): Observable<string> {
+    console.log("Testing a get...");
+    return this.http.get(`http://localhost:${port}/hello`, { responseType: 'text' })
+      .pipe(
+        catchError((error: any) => {
+          return throwError(error);
+        })
+      );
   }
 
-  postTesting() {
-    return this.http.post(this.configUrl, {});
+  postTesting(port : any) {
+    return this.http.post(`localhost://${port}/hello`, {});
   }
 
-  putTesting() {
-    return this.http.put(this.configUrl, {});
+  putTesting(port : any) {
+    return this.http.put(`localhost://${port}/hello`, {});
   }
 
-  deleteTesting() {
-    return this.http.delete(this.configUrl);
+  deleteTesting(port : any) {
+    return this.http.delete(`localhost://${port}/hello`);
   }
 }

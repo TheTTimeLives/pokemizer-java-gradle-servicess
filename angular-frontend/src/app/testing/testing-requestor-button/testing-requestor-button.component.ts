@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { tap } from 'rxjs';
 import { TestingService } from './testing.service';
 
 @Component({
@@ -8,8 +9,18 @@ import { TestingService } from './testing.service';
 })
 export class TestingRequestorButtonComponent {
 
-  getTester() {
+  constructor(private testingService: TestingService) {}
+
+  something : any
+
+  getTester(port : any) {
     console.log("Hello from the tester button")
+    this.testingService.getTesting(port)
+    .pipe(
+      tap(data => console.log('Receiving data', data)),
+    )
+    .subscribe(something => this.something = something);
+
   }
 
 }
