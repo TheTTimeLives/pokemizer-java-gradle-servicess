@@ -36,7 +36,7 @@ jobs:
         id: check-changes
         run: |
           changed_dirs=()
-          for service in ${{ SERVICES//, }}; do
+          for service in "${{ SERVICES//, }}"; do
             if [[ $(git diff --name-only HEAD^ HEAD -- $service) ]]; then
               changed_dirs+=($service)
             fi
