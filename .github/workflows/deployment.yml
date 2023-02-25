@@ -19,8 +19,9 @@ jobs:
     strategy:
       matrix:
         service: [java-announcement, java-battle, java-pokedex, java-testing, java-trainer]
-        # Use the "if" expression to skip the job if the service is not in the changed directories
-        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
+      
+      # Use the "if" expression to skip the job if the service is not in the changed directories
+      if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
 
     steps:
       - name: Checkout
