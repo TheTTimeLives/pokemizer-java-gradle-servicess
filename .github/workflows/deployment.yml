@@ -45,3 +45,25 @@ jobs:
 
       - name: Build and push Docker image for each service with changes
         id: build-and-push
+        run: |
+          for service in ${{ steps.check-changes.outputs.changed_dirs }}; do
+            docker build -t $DOCKER_REGISTRY/$PROJECT_ID/$service:$GITHUB_SHA .
+            docker push $DOCKER_REGISTRY/$PROJECT_ID/$service:$GITHUB_SHA
+          done
+
+      - name: Update Kubernetes deployment for each service with changes
+        if: steps.check-changes.outputs.changed_dirs != ''
+        run: |
+          for service in ${{ steps.check-changes.outputs.changed_dirs }}; do
+            run: uses: google-github-actions/update-k8s-deployment@v0.4
+            with:
+              name: $service
+              image: $DOCKER_REGISTRY/$PROJECT_ID/$service:$GITHUB_SHA
+              namespace: $K8S_NAMESPACE
+              cluster: $K8S_CLUSTER
+
+      - name: Verify deployment
+        run: |
+          for service in $(echo ${{ env.SERVICES }} | tr ',' ' '); do
+            kubectl rollout status deployment/$service -n $K8S_NAMESPACE
+          done
