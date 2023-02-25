@@ -65,7 +65,6 @@ jobs:
 
       - name: Verify deployment
         run: |
-           for service in "${{ SERVICES//,/ }}"; do
+          for service in "${{ SERVICES//,/ }}"; do
             kubectl rollout status deployment/$service -n $K8S_NAMESPACE
           done
-
