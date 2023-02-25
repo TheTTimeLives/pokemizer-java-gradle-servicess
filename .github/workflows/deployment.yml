@@ -16,6 +16,12 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        service: [java-announcement, java-battle, java-pokedex, java-testing, java-trainer]
+        # Use the "if" expression to skip the job if the service is not in the changed directories
+        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -43,25 +49,19 @@ jobs:
           done
           echo "::set-output name=changed_dirs::${changed_dirs[@]}"
 
-      - name: Build and push Docker image for each service with changes
-        id: build-and-push
+      - name: Build and push Docker image
         run: |
-          for service in ${{ steps.check-changes.outputs.changed_dirs }}; do
-            docker build -t $DOCKER_REGISTRY/$PROJECT_ID/$service:$GITHUB_SHA .
-            docker push $DOCKER_REGISTRY/$PROJECT_ID/$service:$GITHUB_SHA
-          done
+          docker build -t $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA .
+          docker push $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA
 
-      - name: Update Kubernetes deployment for each service with changes
-        if: steps.check-changes.outputs.changed_dirs != ''
+      - name: Update Kubernetes deployment
         uses: google-github-actions/update-k8s-deployment@v0.4
         with:
-          name: ${{ each service in steps.check-changes.outputs.changed_dirs }}${{ service }}
-          image: $DOCKER_REGISTRY/$PROJECT_ID/${{ each service in steps.check-changes.outputs.changed_dirs }}${{ service }}:${{ github.sha }}
+          name: ${{ matrix.service }}
+          image: $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA
           namespace: $K8S_NAMESPACE
           cluster: $K8S_CLUSTER
 
       - name: Verify deployment
         run: |
-          for service in $(echo ${{ env.SERVICES }} | tr ',' ' '); do
-            kubectl rollout status deployment/$service -n $K8S_NAMESPACE
-          done
+          kubectl rollout status deployment/${{ matrix.service }} -n $K8S_NAMESPACE
