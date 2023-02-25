@@ -54,11 +54,11 @@ jobs:
       - name: Update Kubernetes deployment for each service with changes
         if: steps.check-changes.outputs.changed_dirs != ''
         uses: google-github-actions/update-k8s-deployment@v0.4
-          with:
-            name: ${{ each service in steps.check-changes.outputs.changed_dirs }}${{ service }}
-            image: $DOCKER_REGISTRY/$PROJECT_ID/${{ each service in steps.check-changes.outputs.changed_dirs }}${{ service }}:${{ github.sha }}
-            namespace: $K8S_NAMESPACE
-            cluster: $K8S_CLUSTER
+        with:
+          name: ${{ each service in steps.check-changes.outputs.changed_dirs }}${{ service }}
+          image: $DOCKER_REGISTRY/$PROJECT_ID/${{ each service in steps.check-changes.outputs.changed_dirs }}${{ service }}:${{ github.sha }}
+          namespace: $K8S_NAMESPACE
+          cluster: $K8S_CLUSTER
 
       - name: Verify deployment
         run: |
