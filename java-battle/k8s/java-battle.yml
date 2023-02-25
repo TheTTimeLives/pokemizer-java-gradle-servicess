@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-battle-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-battle
+  template:
+    metadata:
+      labels:
+        app: java-battle
+    spec:
+      containers:
+      - name: java-battle
+        image: melnikprod/java-battle:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: data
+          mountPath: /data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-battle-service
+spec:
+  selector:
+    app: java-battle
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: java-battle-statefulset
+spec:
+  serviceName: "java-battle-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-battle
+  template:
+    metadata:
+      labels:
+        app: java-battle
+    spec:
+      containers:
+      - name: java-battle
+        image: melnikprod/java-battle:latest
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

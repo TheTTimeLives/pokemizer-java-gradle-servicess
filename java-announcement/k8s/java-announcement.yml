@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-announcement-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-announcement
+  template:
+    metadata:
+      labels:
+        app: java-announcement
+    spec:
+      containers:
+      - name: java-announcement
+        image: melnikprod/java-announcement:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: data
+          mountPath: /data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-announcement-service
+spec:
+  selector:
+    app: java-announcement
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: java-announcement-statefulset
+spec:
+  serviceName: "java-announcement-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-announcement
+  template:
+    metadata:
+      labels:
+        app: java-announcement
+    spec:
+      containers:
+      - name: java-announcement
+        image: melnikprod/java-announcement:latest
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

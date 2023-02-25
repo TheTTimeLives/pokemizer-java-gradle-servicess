@@ -9,7 +9,12 @@ Jakarta (JPA).
 * Plain - An application with no dependencies
 * Servlet - An applet which processes API requests. Tomcat is a container for servlets, meaning that it's purpose is to process and manage API requests.
 * SNAPSHOT -
-    * In versioning, this refers to an in active development version of an application. These versions aren't maintained, won't reliably exist in a production sense and including the word SNAPSHOT in a release's version might be protected for certain commands like publishing.
+    * In versioning, this refers to an in active development version of an application. These versions aren't maintained, won't reliably exist in a production sense and are commonly placeholder.
+
+## Architecture/Installation
+
+* 32bit - Applications which can use 32 bits of memory. An older architecture than 64bit and less performant. Sometimes listed as 386.
+* 64bit - Succesor to 32bit applications. Introduced by AMD, some listed as amd64 on some application installations.
 
 ## Java
 * Tomcat - A common java server which is a servlet "container". It is embedded in Spring.

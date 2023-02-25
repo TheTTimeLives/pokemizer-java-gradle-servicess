@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-testing-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-testing
+  template:
+    metadata:
+      labels:
+        app: java-testing
+    spec:
+      containers:
+      - name: java-testing
+        image: melnikprod/java-testing:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: data
+          mountPath: /data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-testing-service
+spec:
+  selector:
+    app: java-testing
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: java-testing-statefulset
+spec:
+  serviceName: "java-testing-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-testing
+  template:
+    metadata:
+      labels:
+        app: java-testing
+    spec:
+      containers:
+      - name: java-testing
+        image: melnikprod/java-testing:latest
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

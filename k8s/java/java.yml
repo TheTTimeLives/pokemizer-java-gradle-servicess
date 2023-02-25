@@ -1,0 +1,65 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: java-gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: java-apps-vs
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - java-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /java-apps/java-trainer
+    route:
+    - destination:
+        host: java-trainer
+        port:
+          number: 8080
+  - match:
+    - uri:
+        prefix: /java-apps/java-testing
+    route:
+    - destination:
+        host: java-testing
+        port:
+          number: 8080
+  - match:
+    - uri:
+        prefix: /java-apps/java-pokedex
+    route:
+    - destination:
+        host: java-pokedex
+        port:
+          number: 8080
+  - match:
+    - uri:
+        prefix: /java-apps/java-battle
+    route:
+    - destination:
+        host: java-battle
+        port:
+          number: 8080
+  - match:
+    - uri:
+        prefix: /java-apps/java-announcement
+    route:
+    - destination:
+        host: java-announcement
+        port:
+          number: 8080

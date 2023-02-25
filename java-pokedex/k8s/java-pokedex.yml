@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: java-pokedex-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-pokedex
+  template:
+    metadata:
+      labels:
+        app: java-pokedex
+    spec:
+      containers:
+      - name: java-pokedex
+        image: melnikprod/java-pokedex:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: data
+          mountPath: /data
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-pokedex-service
+spec:
+  selector:
+    app: java-pokedex
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: java-pokedex-statefulset
+spec:
+  serviceName: "java-pokedex-service"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: java-pokedex
+  template:
+    metadata:
+      labels:
+        app: java-pokedex
+    spec:
+      containers:
+      - name: java-pokedex
+        image: melnikprod/java-pokedex:latest
+        volumeMounts:
+        - name: data
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
