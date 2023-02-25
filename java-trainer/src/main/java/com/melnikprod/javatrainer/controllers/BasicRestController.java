@@ -4,9 +4,11 @@
 package com.melnikprod.javatrainer.controllers;
 
 import java.util.logging.Logger;
+
+import com.melnikprod.javatrainer.models.Trainer;
+import com.melnikprod.javatrainer.models.TrainerRepository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.melnikprod.javacommon.models.*;
 
 /**
  * @author melnikprod

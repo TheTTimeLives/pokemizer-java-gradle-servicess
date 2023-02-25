@@ -1,4 +1,4 @@
-package com.melnikprod.javacommon.models;
+package com.melnikprod.javatrainer.models;
 
 import org.springframework.data.repository.CrudRepository;
 
