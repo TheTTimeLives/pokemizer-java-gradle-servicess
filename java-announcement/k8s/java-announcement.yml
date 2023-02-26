@@ -1,3 +1,4 @@
+# hi
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -52,17 +53,6 @@ spec:
     metadata:
       labels:
         app: java-announcement
-    spec:
-      containers:
-      - name: java-announcement
-        image: melnikprod/java-announcement:latest
-        volumeMounts:
-        - name: data
-          mountPath: /data
-      volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: data-claim
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
