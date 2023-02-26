@@ -8,6 +8,7 @@ on:
 env:
   DOCKER_REGISTRY: docker.io
   K8S_NAMESPACE: java-test
+  GKE_PROJECT_ID: testgke-378818
   GKE_CLUSTER: gke-test    # Add your cluster name here.
   GKE_ZONE: us-east1-a   # Add your cluster zone here.
   SERVICES: "java-announcement,java-battle,java-pokedex,java-testing,java-trainer"
@@ -24,16 +25,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Authenticate with GCP
+        uses: google-github-actions/auth@v1
+        with:
+          credentials: ${{ secrets.GCP_SA_KEY }}
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1.1.0
         with:
           project_id: ${{ env.GKE_PROJECT_ID }}
-          gcloud_sdk_key: ${{ secrets.GCP_SA_KEY }}
+          skip_install: true
 
       - name: Configure Docker
         run: |
-          echo ${{ secrets.GCP_SA_KEY }} | base64 --decode | \
-          gcloud auth activate-service-account --key-file=-
           gcloud auth configure-docker
 
       - name: Check for changes in each service directory
