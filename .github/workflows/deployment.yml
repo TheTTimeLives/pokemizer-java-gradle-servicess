@@ -79,4 +79,6 @@ jobs:
           credentials: ${{ secrets.GCP_SA_KEY }}
 
       - name: Deploy to Kubernetes
-        if: contains(steps.check-changes.outputs.changed_dirs,
+        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
+        run: |
+          envsubst < ./k8s/${{ matrix.service }}.yml | kubectl apply -f -
