@@ -2,7 +2,7 @@
 FROM gradle:jdk17 as builder
 
 # Copy the Gradle build files
-COPY build.gradle.kts settings.gradle.kts gradle.properties /home/gradle/project/
+COPY build.gradle settings.gradle /home/gradle/project/
 
 # Copy the source code
 COPY src /home/gradle/project/src
