@@ -1,20 +1,21 @@
-# Since these are on Java 17
+# Use the Gradle image with Java 17
+FROM gradle:jdk17 as builder
+
+# Copy the Gradle build files
+COPY build.gradle.kts settings.gradle.kts gradle.properties /home/gradle/project/
+
+# Copy the source code
+COPY src /home/gradle/project/src
+
+# Build the application
+WORKDIR /home/gradle/project/
+RUN gradle bootJar
+
+# Use the slim Java 17 image
 FROM openjdk:17-jdk-slim
 # Copy the jar to a new file called app.jar
-COPY build/libs/java-battle-0.0.1-SNAPSHOT.jar /app.jar
+COPY --from=builder /home/gradle/project/build/libs/java-battle-0.0.1-SNAPSHOT.jar /app.jar
 # Allow web traffic
 EXPOSE 8080
 # Run the jar on launch
-ENTRYPOINT ["java","-jar","/app.jar"]
-
-# Since these are on Java 17
-FROM openjdk:17-jdk-slim
-
-# Copy the jar to a new file called app.jar
-COPY build/libs/java-battle-0.0.1-SNAPSHOT.jar /app.jar
-# Copy the common jar so it will exist in the container
-COPY ../java-common/build/libs/java-common-0.0.1-SNAPSHOT.jar /java-common.jar
-# Putting the common jar on the classpath so it can be grabbed
-ENV CLASSPATH /java-common.jar
-EXPOSE 8080
 ENTRYPOINT ["java","-jar","/app.jar"]
