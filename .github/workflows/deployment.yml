@@ -40,18 +40,23 @@ jobs:
         run: |
           gcloud auth configure-docker
 
-      - name: Check for changes in the service directory
+      - name: Check for changes in each service directory
         id: check-changes
         run: |
-          if [[ $(git diff --name-only HEAD^ HEAD -- ${JOB_NAME#*/}) ]]; then
-            echo "::set-output name=changed_dirs::true"
-          else
-            echo "No changes detected in ${JOB_NAME#*/} directory. Manual deployment required."
-            exit 78
+          changed_dirs=()
+          for service in $(echo ${{ env.SERVICES }} | tr ',' ' '); do
+            if [[ $(git diff --name-only HEAD^ HEAD -- $service) ]]; then
+              changed_dirs+=($service)
+            fi
+          done
+          if [ ${#changed_dirs[@]} -eq 0 ]; then
+            echo "No changes detected. Manual deployment required."
+            exit 78 || exit 0
           fi
+          echo "::set-output name=changed_dirs::${changed_dirs[@]}"
 
       - name: Build and push Docker image
-        if: steps.check-changes.outputs.changed_dirs == 'true'
+        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
           docker build -t $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA ./${{ matrix.service }}
           docker tag $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:latest
@@ -66,11 +71,6 @@ jobs:
           credentials: ${{ secrets.GCP_SA_KEY }}
 
       - name: Deploy to Kubernetes
-        if: steps.check-changes.outputs.changed_dirs == 'true'
+        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
-          envsubst < ./${{ matrix.service }}/k8s/${{ matrix.service }}.yml | kubectl apply -f -
-
-      - name: Verify deployment
-        if: steps.check-changes.outputs.changed_dirs == 'true'
-        run: |
-          kubectl rollout status deployment/${{ matrix.service }} -n $K8S_NAMESPACE
+          envsubst < ./${{ matrix.service }}/k
