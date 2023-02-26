@@ -7,12 +7,10 @@ on:
 
 env:
   PROJECT_ID: my-project-id
-  DOCKER_REGISTRY: gcr.io
-  K8S_NAMESPACE: default
-  K8S_CLUSTER: my-cluster
-  GKE_CLUSTER: cluster-1    # Add your cluster name here.
-  GKE_ZONE: us-central1-c   # Add your cluster zone here.
-  DEPLOYMENT_NAME: gke-test # Add your deployment name here.
+  DOCKER_REGISTRY: docker.io
+  K8S_NAMESPACE: java-test
+  GKE_CLUSTER: gke-test    # Add your cluster name here.
+  GKE_ZONE: us-east1-a   # Add your cluster zone here.
   SERVICES: "java-announcement,java-battle,java-pokedex,java-testing,java-trainer"
 
 jobs:
@@ -30,7 +28,7 @@ jobs:
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1.1.0
         with:
-          project_id: ${{ env.PROJECT_ID }}
+          project_id: ${{ env.GKE_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
 
       - name: Configure Docker
@@ -53,10 +51,10 @@ jobs:
       - name: Build and push Docker image
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
-          docker build -t $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA .
-          docker tag $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:latest
-          docker push $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA
-          docker push $DOCKER_REGISTRY/$PROJECT_ID/${{ matrix.service }}:latest
+          docker build -t $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA .
+          docker tag $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:latest
+          docker push $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA
+          docker push $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:latest
 
       - name: Authenticate with GKE
         uses: google-github-actions/get-gke-credentials@v1
@@ -68,7 +66,7 @@ jobs:
       - name: Deploy to Kubernetes
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
-          envsubst < deployment.yaml | kubectl apply -f -
+          envsubst < ./${{ matrix.service }}/k8s/${{ matrix.service }}.yml | kubectl apply -f -
 
       - name: Verify deployment
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
