@@ -20,6 +20,10 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data-claim
 ---
 apiVersion: v1
 kind: Service
@@ -55,11 +59,16 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: data-claim
   volumeClaimTemplates:
   - metadata:
-      name: data
+      name: data-claim
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      accessModes:
+      - ReadWriteOnce
       resources:
         requests:
           storage: 1Gi
