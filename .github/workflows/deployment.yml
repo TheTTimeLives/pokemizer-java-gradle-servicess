@@ -43,7 +43,7 @@ jobs:
       - name: Check for changes in each service directory
         id: check-changes
         run: |
-          changed_dirs=$(git diff --name-only HEAD~1 HEAD -- $(echo ${{ env.SERVICES }} | tr ',' ' '))
+          changed_dirs=$(git diff --name-only origin/main -- $(echo ${{ env.SERVICES }} | tr ',' ' '))
           if [ -z "$changed_dirs" ]; then
             echo "No changes detected. Manual deployment required."
             exit 78
