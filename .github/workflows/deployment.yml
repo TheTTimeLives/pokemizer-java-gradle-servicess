@@ -54,6 +54,7 @@ jobs:
       - name: Build and push Docker image
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
+          cd ./${{ matrix.service }}
           docker build -t $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA .
           docker tag $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:latest
           docker push $DOCKER_REGISTRY/$GKE_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA
