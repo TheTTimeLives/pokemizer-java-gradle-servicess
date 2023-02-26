@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  PROJECT_ID: my-project-id
   DOCKER_REGISTRY: docker.io
   K8S_NAMESPACE: java-test
   GKE_CLUSTER: gke-test    # Add your cluster name here.
