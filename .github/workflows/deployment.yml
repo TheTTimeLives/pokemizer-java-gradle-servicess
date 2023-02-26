@@ -23,9 +23,6 @@ jobs:
         service: [java-announcement, java-battle, java-pokedex, java-testing, java-trainer]
 
     steps:
-      - name: Set Docker API timeout
-        run: echo '{ "experimental": "enabled", "timeout": 300 }' | sudo tee /etc/docker/daemon.json && sudo systemctl restart docker
-
       - name: Checkout
         uses: actions/checkout@v2
 
