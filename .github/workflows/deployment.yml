@@ -23,6 +23,9 @@ jobs:
         service: [java-announcement, java-battle, java-pokedex, java-testing, java-trainer]
 
     steps:
+      - name: Set Docker API timeout
+        run: echo '{ "experimental": "enabled", "timeout": 300 }' | sudo tee /etc/docker/daemon.json && sudo systemctl restart docker
+
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -63,7 +66,7 @@ jobs:
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
           cd ./${{ matrix.service }}
-          docker build --timeout=360s -t ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:$GITHUB_SHA .
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:$GITHUB_SHA .
           docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:$GITHUB_SHA ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:$GITHUB_SHA
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:latest
@@ -76,11 +79,4 @@ jobs:
           credentials: ${{ secrets.GCP_SA_KEY }}
 
       - name: Deploy to Kubernetes
-        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
-        run: |
-          envsubst < ./k8s/${{ matrix.service }}.yml | kubectl apply -f -
-
-      - name: Verify deployment
-        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
-        run: |
-          kubectl rollout status deployment/${{ matrix.service }} -n $K8S_NAMESPACE
+        if: contains(steps.check-changes.outputs.changed_dirs, $
