@@ -43,17 +43,13 @@ jobs:
       - name: Check for changes in each service directory
         id: check-changes
         run: |
-          changed_dirs=()
-          for service in $(echo ${{ env.SERVICES }} | tr ',' ' '); do
-            if [[ $(git diff --name-only HEAD^ HEAD -- $service) ]]; then
-              changed_dirs+=($service)
-            fi
-          done
-          if [ ${#changed_dirs[@]} -eq 0 ]; then
+          changed_dirs=$(git diff --name-only HEAD^ HEAD -- $(echo ${{ env.SERVICES }} | tr ',' ' '))
+          if [ -z "$changed_dirs" ]; then
             echo "No changes detected. Manual deployment required."
-            exit 78 || exit 0
+            exit 78
+          else
+            echo "::set-output name=changed_dirs::$changed_dirs"
           fi
-          echo "::set-output name=changed_dirs::${changed_dirs[@]}"
 
       - name: Build and push Docker image
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
@@ -73,4 +69,9 @@ jobs:
       - name: Deploy to Kubernetes
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
-          envsubst < ./${{ matrix.service }}/k
+          envsubst < ./${{ matrix.service }}/k8s/${{ matrix.service }}.yml | kubectl apply -f -
+
+      - name: Verify deployment
+        if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
+        run: |
+          kubectl rollout status deployment/${{ matrix.service }} -n $K8S_NAMESPACE
