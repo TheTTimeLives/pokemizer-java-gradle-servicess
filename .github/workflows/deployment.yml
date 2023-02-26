@@ -63,10 +63,10 @@ jobs:
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
           cd ./${{ matrix.service }}
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA .
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID/${{ matrix.service }}:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID/${{ matrix.service }}:$GITHUB_SHA
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID/${{ matrix.service }}:latest
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:$GITHUB_SHA .
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:$GITHUB_SHA ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:$GITHUB_SHA
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/$GCP_PROJECT_ID-${{ matrix.service }}:latest
 
       - name: Authenticate with GKE
         uses: google-github-actions/get-gke-credentials@v1
