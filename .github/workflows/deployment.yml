@@ -23,9 +23,6 @@ jobs:
         service: [java-announcement, java-battle, java-pokedex, java-testing, java-trainer]
 
     steps:
-      - name: Set Docker API timeout
-        run: echo '{ "experimental": "enabled", "timeout": 300 }' | sudo tee /etc/docker/daemon.json && sudo systemctl restart docker
-
       - name: Checkout
         uses: actions/checkout@v2
 
@@ -39,6 +36,10 @@ jobs:
         with:
           project_id: ${{ env.GCP_PROJECT_ID }}
           skip_install: true
+
+      - name: Set Docker API timeout
+        run: |
+          echo '{ "experimental": "enabled", "timeout": 300 }' | sudo tee /etc/docker/daemon.json && sudo systemctl restart docker
 
       - name: Configure Docker
         run: |
@@ -79,4 +80,4 @@ jobs:
           credentials: ${{ secrets.GCP_SA_KEY }}
 
       - name: Deploy to Kubernetes
-        if: contains(steps.check-changes.outputs.changed_dirs, $
+        if: contains(steps.check-changes.outputs.changed_dirs,
