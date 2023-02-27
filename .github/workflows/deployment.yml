@@ -78,4 +78,4 @@ jobs:
       - name: Deploy to Kubernetes
         if: contains(steps.check-changes.outputs.changed_dirs, ${{ matrix.service }})
         run: |
-          envsubst < ./${{ matrix.service }}/k8s/${{ matrix.service }}.yml | kubectl apply -f -
+          envsubst < ./${{ matrix.service }}/k8s/${{ matrix.service }}.yml | kubectl apply -n ${{ env.K8S_NAMESPACE}} -f -
