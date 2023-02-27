@@ -18,4 +18,5 @@ COPY --from=builder /home/gradle/project/build/libs/java-pokedex-0.0.1-SNAPSHOT.
 # Allow web traffic
 EXPOSE 8080
 # Run the jar on launch
-ENTRYPOINT ["java","-jar","/app.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar /app.jar ; exec bash"]
+
